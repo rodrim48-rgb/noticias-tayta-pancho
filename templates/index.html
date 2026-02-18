@@ -26,7 +26,6 @@
 <nav class="navbar navbar-dark topbar">
   <div class="container py-2">
     <span class="navbar-brand brand">NOTI TAYTA PANCHO</span>
-    <a class="btn btn-outline-light btn-sm" href="/login">Miembros</a>
   </div>
 </nav>
 
@@ -42,27 +41,27 @@
   <div class="row g-4">
 
     <!-- NOTICIAS -->
-    <div class="col-lg-8">
-      <h2 class="h5 mb-3">Últimas noticias</h2>
+    <h2 class="h4 mb-4 border-bottom pb-2">Últimas noticias</h2>
 
-      {% if avisos and avisos|length > 0 %}
-        {% for a in avisos %}
-          <div class="card mb-3">
-            <div class="card-body">
-              <h3 class="h5 mb-1">{{ a[1] }}</h3>
-              <div class="muted mb-2">Publicado oficialmente</div>
-              <p class="mb-0">{{ a[2] }}</p>
-            </div>
-          </div>
-        {% endfor %}
-      {% else %}
-        <div class="card mb-3">
-          <div class="card-body">
-            <h3 class="h5 mb-1">Aún no hay noticias publicadas</h3>
-            <p class="mb-0">Ingresa como director y publica la primera noticia.</p>
-          </div>
-        </div>
-      {% endif %}
+{% if avisos and avisos|length > 0 %}
+  {% for a in avisos %}
+    <div class="card mb-4 shadow-sm">
+      <div class="card-body">
+        <h3 class="h5 fw-bold text-uppercase mb-2">{{ a[1] }}</h3>
+        <p class="text-muted small mb-3">
+          Publicado por Redacción — Hermandad de Tayta Pancho
+        </p>
+        <p class="mb-0">{{ a[2] }}</p>
+      </div>
+    </div>
+  {% endfor %}
+{% else %}
+  <div class="alert alert-secondary">
+    <strong>Aún no hay noticias publicadas.</strong><br>
+    La primera comunicación oficial aparecerá aquí.
+  </div>
+{% endif %}
+
     </div>
 
     <!-- VIDEO -->
