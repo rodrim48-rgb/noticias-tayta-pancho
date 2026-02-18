@@ -1,10 +1,13 @@
 from flask import Flask, render_template, request, redirect, session
+from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 
 app = Flask(__name__)
-app.secret_key = "tayta_pancho_secret"
+app.secret_key = "tayta_pancho_secret_super_seguro"
 
+# -------------------------
 # Crear base de datos
+# -------------------------
 def init_db():
     conn = sqlite3.connect("hermandad.db")
     c = conn.cursor()
@@ -25,6 +28,9 @@ def init_db():
 
 init_db()
 
+# -------------------------
+# PORTADA PÚBLICA
+# -------------------------
 @app.route("/")
 def index():
     conn = sqlite3.connect("hermandad.db")
@@ -34,7 +40,10 @@ def index():
     conn.close()
     return render_template("index.html", avisos=avisos)
 
-@app.route("/acceso-interno", methods=["GET","POST"])
+# -------------------------
+# LOGIN OCULTO
+# -------------------------
+@app.route("/acceso-interno", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         username = request.form["username"]
@@ -42,11 +51,11 @@ def login():
 
         conn = sqlite3.connect("hermandad.db")
         c = conn.cursor()
-        c.execute("SELECT * FROM users WHERE username=? AND password=?", (username,password))
+        c.execute("SELECT * FROM users WHERE username=?", (username,))
         user = c.fetchone()
         conn.close()
 
-        if user:
+        if user and check_password_hash(user[2], password):
             session["user"] = user[1]
             session["role"] = user[3]
             return redirect("/panel")
@@ -55,7 +64,10 @@ def login():
 
     return render_template("login.html")
 
-@app.route("/panel", methods=["GET","POST"])
+# -------------------------
+# PANEL INTERNO
+# -------------------------
+@app.route("/panel", methods=["GET", "POST"])
 def panel():
     if "user" not in session:
         return redirect("/acceso-interno")
@@ -73,10 +85,32 @@ def panel():
 
     return render_template("panel.html", role=session["role"])
 
+# -------------------------
+# LOGOUT
+# -------------------------
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect("/")
 
+# -------------------------
+# CREAR DIRECTOR AUTOMÁTICO (solo si no existe)
+# -------------------------
+def crear_director():
+    conn = sqlite3.connect("hermandad.db")
+    c = conn.cursor()
+
+    c.execute("SELECT * FROM users WHERE username='director'")
+    if not c.fetchone():
+        password_hash = generate_password_hash("1234")
+        c.execute("INSERT INTO users (username, password, role) VALUES (?,?,?)",
+                  ("director", password_hash, "director"))
+        conn.commit()
+
+    conn.close()
+
+crear_director()
+
+# -------------------------
 if __name__ == "__main__":
     app.run(debug=True)
