@@ -45,22 +45,26 @@
         <h2 class="h5 mb-3">Últimas noticias</h2>
 
         <!-- Noticia demo (luego la haremos dinámica) -->
-        <div class="card mb-3">
-          <div class="card-body">
-            <h3 class="h5 mb-1">Bienvenidos a Noti Tayta Pancho</h3>
-            <div class="muted mb-2">Actualizado hoy</div>
-            <p class="mb-0">Aquí publicaremos avisos, novedades y enlaces a nuestros videos de YouTube.</p>
-          </div>
-        </div>
+       <h2 class="h5 mb-3">Últimas noticias</h2>
 
-        <div class="card mb-3">
-          <div class="card-body">
-            <h3 class="h5 mb-1">Próximamente: panel de directores</h3>
-            <div class="muted mb-2">Acceso solo para miembros</div>
-            <p class="mb-0">Tendrás un panel oculto para publicar noticias sin que cualquiera pueda editar.</p>
-          </div>
-        </div>
+{% if avisos and avisos|length > 0 %}
+  {% for a in avisos %}
+    <div class="card mb-3">
+      <div class="card-body">
+        <h3 class="h5 mb-1">{{ a[1] }}</h3>
+        <div class="muted mb-2">Publicado</div>
+        <p class="mb-0">{{ a[2] }}</p>
       </div>
+    </div>
+  {% endfor %}
+{% else %}
+  <div class="card mb-3">
+    <div class="card-body">
+      <h3 class="h5 mb-1">Aún no hay noticias publicadas</h3>
+      <p class="mb-0">Entra como director y publica la primera noticia.</p>
+    </div>
+  </div>
+{% endif %}
 
       <!-- Sidebar -->
       <div class="col-lg-4">
