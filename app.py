@@ -34,7 +34,7 @@ def index():
     conn.close()
     return render_template("index.html", avisos=avisos)
 
-@app.route("/login", methods=["GET","POST"])
+@app.route("/acceso-interno", methods=["GET","POST"])
 def login():
     if request.method == "POST":
         username = request.form["username"]
@@ -58,7 +58,7 @@ def login():
 @app.route("/panel", methods=["GET","POST"])
 def panel():
     if "user" not in session:
-        return redirect("/login")
+        return redirect("/acceso-interno")
 
     if request.method == "POST" and session["role"] == "director":
         titulo = request.form["titulo"]
