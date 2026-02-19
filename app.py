@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, session, abort, url_for
 import sqlite3
 from datetime import datetime
+import os
 
 app = Flask(__name__)
 app.secret_key = "noticias_tayta_pancho_secret"
@@ -9,11 +10,11 @@ DB = "hermandad.db"
 
 
 # -------------------------
-# DB
+# DB helpers
 # -------------------------
 def get_conn():
     conn = sqlite3.connect(DB)
-    conn.row_factory = sqlite3.Row  # para usar n["titulo"] en vez de n[1]
+    conn.row_factory = sqlite3.Row
     return conn
 
 
@@ -51,51 +52,59 @@ init_db()
 
 
 # -------------------------
-# Público
+# Página principal (PÚBLICA)
 # -------------------------
 @app.route("/")
 def index():
-    provincia = request.args.get("provincia", "Pomabamba").strip()
-    q = request.args.get("q", "").strip()
+    try:
+        provincia = request.args.get("provincia", "Pomabamba").strip()
+        q = request.args.get("q", "").strip()
 
-    conn = get_conn()
-    c = conn.cursor()
+        conn = get_conn()
+        c = conn.cursor()
 
-    # destacada
-    c.execute("""
-        SELECT * FROM avisos
-        WHERE provincia=? AND featured=1
-        ORDER BY id DESC
-        LIMIT 1
-    """, (provincia,))
-    destacada = c.fetchone()
-
-    # lista
-    if q:
+        # destacada
         c.execute("""
             SELECT * FROM avisos
-            WHERE provincia=? AND (titulo LIKE ? OR resumen LIKE ? OR contenido LIKE ?)
+            WHERE provincia=? AND featured=1
             ORDER BY id DESC
-        """, (provincia, f"%{q}%", f"%{q}%", f"%{q}%"))
-    else:
-        c.execute("""
-            SELECT * FROM avisos
-            WHERE provincia=?
-            ORDER BY id DESC
+            LIMIT 1
         """, (provincia,))
+        destacada = c.fetchone()
 
-    noticias = c.fetchall()
-    conn.close()
+        # lista
+        if q:
+            c.execute("""
+                SELECT * FROM avisos
+                WHERE provincia=? AND (titulo LIKE ? OR resumen LIKE ? OR contenido LIKE ?)
+                ORDER BY id DESC
+            """, (provincia, f"%{q}%", f"%{q}%", f"%{q}%"))
+        else:
+            c.execute("""
+                SELECT * FROM avisos
+                WHERE provincia=?
+                ORDER BY id DESC
+            """, (provincia,))
+        noticias = c.fetchall()
+        conn.close()
 
-    return render_template(
-        "index.html",
-        provincia=provincia,
-        q=q,
-        destacada=destacada,
-        noticias=noticias
-    )
+        # SIEMPRE retorna HTML
+        return render_template(
+            "index.html",
+            provincia=provincia,
+            q=q,
+            destacada=destacada,
+            noticias=noticias
+        )
+
+    except Exception as e:
+        # Esto hará que el error salga en logs en Render y no en blanco
+        return f"ERROR EN / : {e}", 500
 
 
+# -------------------------
+# Noticia completa
+# -------------------------
 @app.route("/noticia/<int:noticia_id>")
 def noticia(noticia_id):
     conn = get_conn()
@@ -103,15 +112,13 @@ def noticia(noticia_id):
     c.execute("SELECT * FROM avisos WHERE id=?", (noticia_id,))
     n = c.fetchone()
     conn.close()
-
     if not n:
         abort(404)
-
     return render_template("noticia.html", n=n)
 
 
 # -------------------------
-# Acceso interno (oculto)
+# Acceso interno (no visible)
 # -------------------------
 @app.route("/acceso-interno", methods=["GET", "POST"])
 def login():
@@ -141,7 +148,7 @@ def panel():
         return redirect("/acceso-interno")
 
     if session.get("role") != "director":
-        return "No autorizado"
+        return "No autorizado", 403
 
     if request.method == "POST":
         titulo = request.form["titulo"].strip()
@@ -158,7 +165,6 @@ def panel():
         conn = get_conn()
         c = conn.cursor()
 
-        # si marco destacada, quitamos otras destacadas de esa provincia
         if featured == 1:
             c.execute("UPDATE avisos SET featured=0 WHERE provincia=?", (provincia,))
 
@@ -182,7 +188,7 @@ def logout():
 
 
 # -------------------------
-# Primera cuenta director (solo una vez)
+# Crear director 1 vez
 # -------------------------
 @app.route("/crear-director")
 def crear_director():
@@ -198,7 +204,3 @@ def crear_director():
 
     conn.close()
     return "Director listo: usuario=director clave=1234 (cámbiala luego)."
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
