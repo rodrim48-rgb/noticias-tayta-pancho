@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#0B1220"/>
+      <stop offset="1" stop-color="#1F3A8A"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#g)"/>
+  <rect x="60" y="60" width="1080" height="555" rx="28" fill="rgba(255,255,255,0.10)"/>
+  <text x="100" y="170" font-size="54" fill="#ffffff" font-family="Arial, sans-serif" font-weight="700">
+    Noticias Tayta Pancho
+  </text>
+  <text x="100" y="240" font-size="28" fill="rgba(255,255,255,0.80)" font-family="Arial, sans-serif">
+    Imagen referencial · 16:9
+  </text>
+  <text x="100" y="540" font-size="22" fill="rgba(255,255,255,0.75)" font-family="Arial, sans-serif">
+    Reemplaza este archivo por una foto real cuando tengas cobertura.
+  </text>
+</svg>

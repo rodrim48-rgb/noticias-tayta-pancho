@@ -1,37 +1,130 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Panel - Noti Tayta Pancho</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Panel | Noticias Tayta Pancho</title>
+
+  <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body{ background:#f4f6f9; }
+    .card{ border-radius:16px; }
+    .title{ font-weight:800; letter-spacing:.2px; }
+    .hint{ color:#64748b; }
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+  </style>
 </head>
-<body class="bg-light">
-  <div class="container py-4" style="max-width: 900px;">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h1 class="h4 m-0">Panel de publicaciones</h1>
+
+<body>
+  <div class="container py-4" style="max-width: 1100px;">
+    <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between mb-3">
       <div>
-        <a class="btn btn-outline-dark btn-sm" href="/">Ver web</a>
-        <a class="btn btn-dark btn-sm" href="/logout">Salir</a>
+        <h1 class="h3 title mb-0">Panel de publicaciones</h1>
+        <div class="hint">Usuario: <span class="mono">{{ user }}</span> · Rol: <span class="mono">{{ role }}</span></div>
+      </div>
+      <div class="d-flex gap-2">
+        <a class="btn btn-outline-dark" href="{{ url_for('index') }}">Ver web</a>
+        <a class="btn btn-dark" href="{{ url_for('logout') }}">Salir</a>
       </div>
     </div>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} mb-3">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
     {% if role != "director" %}
       <div class="alert alert-warning">
-        Estás logueado como <b>{{ role }}</b>. Solo un <b>director</b> puede publicar.
+        Solo el rol <b>director</b> puede publicar por ahora.
       </div>
     {% else %}
-      <div class="card card-body">
-        <h2 class="h6">Nueva noticia</h2>
-        <form method="POST">
-          <label class="form-label">Título</label>
-          <input class="form-control mb-3" name="titulo" required>
+      <div class="row g-4">
+        <div class="col-lg-6">
+          <div class="card p-3 p-md-4">
+            <h2 class="h5 title mb-2">Nueva noticia</h2>
+            <p class="hint mb-3">Recomendado: imagen 16:9 (por ejemplo 1200×675). Si no subes imagen, se mostrará un placeholder.</p>
 
-          <label class="form-label">Contenido</label>
-          <textarea class="form-control mb-3" name="contenido" rows="5" required></textarea>
+            <form method="POST" enctype="multipart/form-data">
+              <label class="form-label">Provincia / Sección</label>
+              <select class="form-select mb-3" name="provincia" required>
+                {% for p in provincias %}
+                  <option value="{{ p }}">{{ p }}</option>
+                {% endfor %}
+              </select>
 
-          <button class="btn btn-primary">Publicar</button>
-        </form>
+              <label class="form-label">Título</label>
+              <input class="form-control mb-3" name="titulo" required>
+
+              <label class="form-label">Resumen (sale en tarjetas)</label>
+              <textarea class="form-control mb-3" name="resumen" rows="2" placeholder="Breve (1–2 líneas). Si lo dejas vacío, se genera automático."></textarea>
+
+              <label class="form-label">Noticia completa</label>
+              <textarea class="form-control mb-3" name="contenido" rows="10" required placeholder="Escribe aquí la noticia completa…"></textarea>
+
+              <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="featured" name="featured">
+                <label class="form-check-label" for="featured">
+                  Marcar como destacada (solo una por provincia)
+                </label>
+              </div>
+
+              <label class="form-label">Imagen (subir archivo)</label>
+              <input class="form-control mb-2" type="file" name="imagen_file" accept=".png,.jpg,.jpeg,.webp,.gif">
+
+              <div class="hint mb-3">
+                Alternativa: si ya tienes una imagen en <span class="mono">static/img/</span> o <span class="mono">static/uploads/</span>,
+                puedes poner la ruta relativa:
+                <span class="mono">img/mi-foto.png</span> o <span class="mono">uploads/mi-foto.jpg</span> (sin restricción).
+              </div>
+
+              <label class="form-label">Ruta manual (opcional)</label>
+              <input class="form-control mb-3 mono" name="imagen_path" placeholder="img/mi-foto.png (opcional)">
+
+              <button class="btn btn-primary fw-bold">Publicar</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="card p-3 p-md-4">
+            <h2 class="h5 title mb-3">Últimas publicaciones</h2>
+            {% if posts and posts|length > 0 %}
+              <div class="table-responsive">
+                <table class="table align-middle">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Título</th>
+                      <th>Provincia</th>
+                      <th>Fecha</th>
+                      <th>Dest.</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for p in posts %}
+                      <tr>
+                        <td class="mono">{{ p.id }}</td>
+                        <td>{{ p.titulo }}</td>
+                        <td>{{ p.provincia }}</td>
+                        <td class="mono">{{ p.created_at|fecha_pe }}</td>
+                        <td>{% if p.featured == 1 %}✅{% else %}—{% endif %}</td>
+                        <td><a class="btn btn-sm btn-outline-dark" href="{{ url_for('noticia', noticia_id=p.id) }}" target="_blank">Ver</a></td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% else %}
+              <p class="hint mb-0">Aún no hay publicaciones.</p>
+            {% endif %}
+          </div>
+        </div>
       </div>
     {% endif %}
   </div>

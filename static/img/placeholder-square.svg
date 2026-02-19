@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800">
+  <rect width="800" height="800" fill="#0B1220"/>
+  <rect x="60" y="60" width="680" height="680" rx="28" fill="rgba(255,255,255,0.10)"/>
+  <text x="100" y="200" font-size="48" fill="#ffffff" font-family="Arial, sans-serif" font-weight="700">
+    Noticias Tayta Pancho
+  </text>
+  <text x="100" y="270" font-size="26" fill="rgba(255,255,255,0.80)" font-family="Arial, sans-serif">
+    Placeholder cuadrado
+  </text>
+</svg>
