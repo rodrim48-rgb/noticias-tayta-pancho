@@ -13,50 +13,44 @@
       --dark:#0b1220;
       --blue:#1f3a8a;
       --bg:#f4f6f9;
+      --muted:#6c757d;
     }
-
-    body{
-      background:var(--bg);
-    }
-
-    .topbar{
-      background:var(--dark);
-    }
-
-    .brand-name{
-      font-weight:900;
-      letter-spacing:.5px;
-      color:white;
-    }
-
+    body{ background:var(--bg); }
+    .topbar{ background:var(--dark); }
+    .brand-name{ font-weight:900; letter-spacing:.5px; color:white; }
     .hero{
       background: linear-gradient(135deg, var(--dark), var(--blue));
       color:white;
       border-radius:18px;
-      padding:30px;
+      padding:28px;
       text-align:center;
     }
-
     .pomabamba-btn{
-      display:block;
-      margin:25px auto;
-      text-align:center;
-      transition:0.3s;
+      display:flex;
+      justify-content:center;
+      margin:18px 0 8px;
+      transition:0.25s;
+      text-decoration:none;
     }
-
     .pomabamba-btn img{
-      height:80px;
+      height:78px;
+      max-width:100%;
     }
+    .pomabamba-btn:hover{ transform:scale(1.04); }
 
-    .pomabamba-btn:hover{
-      transform:scale(1.05);
+    .section-title{
+      font-weight:800;
+      border-bottom:1px solid #e5e7eb;
+      padding-bottom:.6rem;
+      margin-bottom:1rem;
     }
-
     .card{
       border-radius:14px;
       box-shadow:0 4px 12px rgba(0,0,0,.05);
-      margin-bottom:15px;
+      border:1px solid rgba(0,0,0,.06);
     }
+    .news-title{ font-weight:800; }
+    .muted{ color:var(--muted); }
   </style>
 </head>
 
@@ -66,7 +60,7 @@
 <nav class="navbar topbar">
   <div class="container py-2 d-flex align-items-center">
     <a class="navbar-brand d-flex align-items-center gap-2 m-0" href="/">
-      <img src="{{ url_for('static', filename='img/logo.png') }}" height="40">
+      <img src="{{ url_for('static', filename='img/logo.png') }}" height="40" alt="Logo">
       <span class="brand-name">NOTICIAS TAYTA PANCHO</span>
     </a>
   </div>
@@ -75,42 +69,68 @@
 <main class="container my-4">
 
   <!-- HERO -->
-  <section class="hero mb-4">
+  <section class="hero mb-3">
     <h1 class="h4 mb-2">Medio informativo local</h1>
-    <p class="mb-0 text-white-50">
-      Información y actualidad de Pomabamba
-    </p>
+    <p class="mb-0 text-white-50">Información y actualidad de Pomabamba</p>
   </section>
 
   <!-- BOTÓN CENTRAL POMABAMBA -->
-  <a class="pomabamba-btn" href="/?provincia=Pomabamba">
+  <a class="pomabamba-btn" href="/?provincia=Pomabamba" title="Ver noticias de Pomabamba">
     <img src="{{ url_for('static', filename='img/pomabamba.png') }}" alt="Pomabamba">
   </a>
 
-  <!-- NOTICIAS -->
-  <div>
+  <div class="row g-4 mt-2">
 
-    {% if noticias and noticias|length > 0 %}
-      {% for n in noticias %}
-        {% if n[4] == "Pomabamba" %}
+    <!-- NOTICIAS -->
+    <div class="col-lg-8">
+      <h2 class="h5 section-title">Noticias de Pomabamba</h2>
+
+      {% set pomos = [] %}
+      {% if noticias and noticias|length > 0 %}
+        {% for n in noticias %}
+          {% if n[4] == "Pomabamba" %}
+            {% set _ = pomos.append(n) %}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+
+      {% if pomos and pomos|length > 0 %}
+        {% for n in pomos %}
+          <div class="card mb-3">
+            <div class="card-body">
+              <div class="muted small mb-1">Pomabamba • {{ n[5] if n[5] else "Publicado" }}</div>
+              <h3 class="h6 news-title mb-2">{{ n[1] }}</h3>
+              <p class="mb-2">{{ n[2] if n[2] else "" }}</p>
+              <a href="/noticia/{{ n[0] }}" class="fw-bold text-decoration-none">
+                Leer noticia completa →
+              </a>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
         <div class="card">
           <div class="card-body">
-            <h3 class="h6 fw-bold">{{ n[1] }}</h3>
-            <p class="mb-2">{{ n[2] }}</p>
-            <a href="/noticia/{{ n[0] }}" class="fw-bold text-decoration-none">
-              Leer noticia completa →
-            </a>
+            <h5 class="mb-1">Aún no hay noticias en Pomabamba</h5>
+            <p class="mb-0 muted">Publica la primera noticia desde el panel interno.</p>
           </div>
         </div>
-        {% endif %}
-      {% endfor %}
-    {% else %}
+      {% endif %}
+    </div>
+
+    <!-- VIDEO EN VIVO -->
+    <div class="col-lg-4">
+      <h2 class="h5 section-title">Transmisión en vivo</h2>
       <div class="card">
-        <div class="card-body">
-          <h5>No hay noticias aún</h5>
+        <div class="card-body p-2">
+          <div class="ratio ratio-16x9">
+            <iframe
+              src="https://www.youtube.com/embed/Hmok4xM2SCs"
+              title="Transmisión en vivo"
+              allowfullscreen></iframe>
+          </div>
         </div>
       </div>
-    {% endif %}
+    </div>
 
   </div>
 
@@ -118,4 +138,5 @@
 
 </body>
 </html>
+
 
