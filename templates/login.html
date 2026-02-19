@@ -4,45 +4,26 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Acceso interno | Noticias Tayta Pancho</title>
-  <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  <style>
-    body{ background:#0B1220; color:#fff; }
-    .card{ border-radius:18px; }
-    .hint{ color: rgba(255,255,255,.75); }
-  </style>
 </head>
-<body>
-  <div class="container py-5" style="max-width: 520px;">
-    <div class="text-center mb-3">
-      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo Noticias Tayta Pancho" style="height:78px; width:auto;">
-      <h1 class="h4 mt-3 mb-1">Acceso interno</h1>
-      <p class="hint mb-0">Solo para administración.</p>
-    </div>
+<body class="bg-light">
+  <div class="container py-5" style="max-width:520px;">
+    <div class="card p-4 shadow-sm">
+      <h1 class="h4 fw-bold mb-3">Acceso interno</h1>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }} mb-3">{{ message }}</div>
-        {% endfor %}
+      {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
       {% endif %}
-    {% endwith %}
 
-    <div class="card p-4 text-dark">
-      <form method="POST" action="{{ url_for('login') }}">
+      <form method="POST">
         <label class="form-label">Usuario</label>
-        <input class="form-control mb-3" name="username" autocomplete="username" required>
+        <input class="form-control mb-3" name="username" required>
 
-        <label class="form-label">Contraseña</label>
-        <input class="form-control mb-3" type="password" name="password" autocomplete="current-password" required>
+        <label class="form-label">Clave</label>
+        <input class="form-control mb-3" type="password" name="password" required>
 
-        <button class="btn btn-primary w-100 fw-bold">Ingresar</button>
+        <button class="btn btn-primary w-100">Entrar</button>
       </form>
-
-      <div class="mt-3 small text-secondary">
-        Tip: Si es la primera vez, el usuario por defecto es <b>director</b> y la clave es <b>1234</b> (cámbiala en producción).
-      </div>
     </div>
   </div>
 </body>
