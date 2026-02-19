@@ -9,13 +9,9 @@
       <h1 class="display-6 fw-bold mb-1">Información clara y verificada</h1>
       <div class="text-white-50">Filtrado por provincia: <b>{{ provincia }}</b></div>
     </div>
-    <div class="text-white-50 small">
-      Actualizado al momento • Cobertura local
-    </div>
   </div>
 </section>
 
-<!-- Botón Pomabamba central con imagen -->
 <a class="pomabamba-btn" href="/?provincia=Pomabamba" title="Ver Pomabamba">
   <img src="{{ url_for('static', filename='img/pomabamba.png') }}" alt="Pomabamba">
 </a>
@@ -23,37 +19,15 @@
 <div class="row g-4 mt-2">
 
   <div class="col-lg-8">
-
-    <div class="d-flex align-items-center justify-content-between mb-2">
-      <h2 class="h4 fw-bold m-0">Portada</h2>
-      <span class="badge text-bg-light border">{{ noticias|length }} resultado(s)</span>
-    </div>
-
-    {% if destacada %}
-      <div class="cardx p-3 p-lg-4 mb-4">
-        <div class="muted mb-2">{{ destacada["provincia"] }} • {{ destacada["created_at"] }}</div>
-        <h3 class="h3 fw-bold mb-2">{{ destacada["titulo"] }}</h3>
-        <p class="fs-5 mb-3">{{ destacada["resumen"] }}</p>
-        <a class="btn btn-primary pill px-4" href="/noticia/{{ destacada['id'] }}">Leer noticia completa</a>
-      </div>
-    {% endif %}
-
     <h2 class="h4 fw-bold mb-3">Últimas noticias</h2>
 
     {% if noticias and noticias|length > 0 %}
       {% for n in noticias %}
         <div class="cardx p-3 mb-3">
           <div class="muted small mb-1">{{ n["provincia"] }} • {{ n["created_at"] }}</div>
-          <div class="d-flex align-items-start justify-content-between gap-3">
-            <div>
-              <h3 class="h5 fw-bold mb-2">{{ n["titulo"] }}</h3>
-              <p class="mb-2">{{ n["resumen"] }}</p>
-              <a class="fw-bold text-decoration-none" href="/noticia/{{ n['id'] }}">Leer noticia completa →</a>
-            </div>
-            {% if n["featured"] == 1 %}
-              <span class="badge text-bg-primary align-self-start">Destacada</span>
-            {% endif %}
-          </div>
+          <h3 class="h5 fw-bold mb-2">{{ n["titulo"] }}</h3>
+          <p class="mb-2">{{ n["resumen"] }}</p>
+          <a class="fw-bold text-decoration-none" href="/noticia/{{ n['id'] }}">Leer noticia completa →</a>
         </div>
       {% endfor %}
     {% else %}
@@ -62,7 +36,6 @@
         <p class="muted mb-0">Publica la primera noticia desde el panel interno.</p>
       </div>
     {% endif %}
-
   </div>
 
   <div class="col-lg-4">
@@ -80,6 +53,3 @@
 </div>
 
 {% endblock %}
-
-
-
